@@ -35,7 +35,7 @@ fn greet(name: &str) -> String {
 /// ```
 #[tauri::command]
 fn check_pve(ip: &str) -> bool {
-    let v = vec!["192.168.1.210", "10.10.10.2"];
+    let v = vec!["192.168.1.210", "10.10.10.2", "192.168.2.230"];
     v.contains(&ip)
 }
 
