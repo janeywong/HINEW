@@ -72,8 +72,38 @@ export interface ProxmoxEngineOptionsToken extends ProxmoxEngineOptionsCommon {
     tokenSecret: string;
 }
 
+export interface ClientOptions {
+    /**
+     * Defines the maximum number of redirects the client should follow.
+     * If set to 0, no redirects will be followed.
+     */
+    maxRedirections?: number
+    /** Timeout in milliseconds */
+    connectTimeout?: number
+    /**
+     * Configuration for dangerous settings on the client such as disabling SSL verification.
+     */
+    danger?: DangerousSettings
+}
+
+/**
+ * Configuration for dangerous settings on the client such as disabling SSL verification.
+ *
+ * @since 2.3.0
+ */
+export interface DangerousSettings {
+    /**
+     * Disables SSL verification.
+     */
+    acceptInvalidCerts?: boolean
+    /**
+     * Disables hostname verification.
+     */
+    acceptInvalidHostnames?: boolean
+}
+
 // type FetchInterface = typeof fetch;
-export type FetchInterface = (url: string | URL, options?: RequestInit) => Promise<Response>;
+export type FetchInterface = (url: string | URL, options?: RequestInit & ClientOptions) => Promise<Response>;
 
 /**
  * Type Union for proxmox Authentification options
@@ -201,7 +231,12 @@ export class ProxmoxEngine implements ApiRequestable {
             }
         }
         let res: Response | null = null;
-        const fetchInit: RequestInit = { method, body, headers };
+        const fetchInit: RequestInit & ClientOptions = {
+            method, body, headers, danger: {
+                acceptInvalidCerts: true,
+                acceptInvalidHostnames: true
+            }
+        };
 
         try {
             const controller = new AbortController();
@@ -321,8 +356,10 @@ export class ProxmoxEngine implements ApiRequestable {
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), this.authTimeout);
             const method = 'POST';
-            const { signal } = controller;
-            const r = await this.fetch(requestUrl, { method, headers, signal, body });
+            const {signal} = controller;
+            const r = await this.fetch(requestUrl, {method, headers, signal, body, danger: {
+                acceptInvalidCerts: true, acceptInvalidHostnames: true
+                }});
             clearTimeout(id);
             const text = await r.text();
             if (r.status !== 200) {
