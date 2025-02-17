@@ -58,6 +58,7 @@ async function run(): Promise<void> {
 
     const uploadToken = putPolicy.uploadToken(mac);
     const config = new qiniu.conf.Config();
+    config.zone = qiniu.zone.Zone_na0;
     const formUploader = new qiniu.form_up.FormUploader(config);
     const putExtra = new qiniu.form_up.PutExtra();
     formUploader.putFile(
