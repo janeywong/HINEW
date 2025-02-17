@@ -1,12 +1,12 @@
 import fs from "fs";
 import path from "path";
-import * as qiniu from 'qiniu'
+import qiniu from 'qiniu'
 
 async function run(): Promise<void> {
     const artifact_paths = process.env.ARTIFACT_PATHS;
     const target = process.env.TARGET;
     const platform = process.env.PLATFORM;
-    const version = process.env.VERSION;
+    const version = process.env.GITHUB_REF_NAME;
     const args = process.env.ARGS;
     const workspace = process.env.WORKSPACE;
 
@@ -41,7 +41,7 @@ async function run(): Promise<void> {
 
     console.log('GITHUB_REF_NAME', process.env.GITHUB_REF_NAME);
 
-    console.log(process.env);
+    // console.log(process.env);
 
     let key = `${prefix}/${version}/${uploaderFilename}`;
     if (args) {
